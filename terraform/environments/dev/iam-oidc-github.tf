@@ -171,38 +171,25 @@ resource "aws_iam_policy" "github_dev_env_plan_policy" {
 
 
 
-resource "aws_iam_policy" "github_apply_policy" {
-  
-  name = "github_apply_policy"
+resource "aws_iam_policy" "github_apply_storage_secrets_policy" {
+  name = "github_apply_storage_secrets_policy"
 
-  policy= jsonencode({
-    
-    Version: "2012-10-17",
-    
-    Statement: [
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
       {
-        Sid = "S3BucketReadPermissions",
+        Sid    = "S3BucketReadPermissions"
         
-        Effect = "Allow",
+        Effect = "Allow"
         
-        Action= [
-          "s3:GetAccelerateConfiguration",
-          "s3:GetBucketAcl",
-          "s3:GetBucketCORS",
-          "s3:GetBucketLogging",
-          "s3:GetBucketObjectLockConfiguration",
-          "s3:GetBucketPolicy",
-          "s3:GetBucketPublicAccessBlock",
-          "s3:GetBucketRequestPayment",
-          "s3:GetBucketTagging",
-          "s3:GetBucketVersioning",
-          "s3:GetBucketWebsite",
-          "s3:GetEncryptionConfiguration",
-          "s3:GetLifecycleConfiguration",
-          "s3:GetReplicationConfiguration",
-          "s3:ListBucket"
-        ],
-
+        Action = [
+          "s3:GetAccelerateConfiguration", "s3:GetBucketAcl", "s3:GetBucketCORS",
+          "s3:GetBucketLogging", "s3:GetBucketObjectLockConfiguration", "s3:GetBucketPolicy",
+          "s3:GetBucketPublicAccessBlock", "s3:GetBucketRequestPayment", "s3:GetBucketTagging",
+          "s3:GetBucketVersioning", "s3:GetBucketWebsite", "s3:GetEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration", "s3:GetReplicationConfiguration", "s3:ListBucket"
+        ]
+        
         Resource = [
           "arn:aws:s3:::medicare-pipeline-tf-state-cjk-2026",
           "arn:aws:s3:::medicare-cms-data-cjk-2026",
@@ -210,16 +197,11 @@ resource "aws_iam_policy" "github_apply_policy" {
         ]
       },
       {
-        Sid = "S3ObjectReadWritePermissions",
+        Sid    = "S3ObjectReadWritePermissions"
         
-        Effect = "Allow",
+        Effect = "Allow"
         
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:GetObjectTagging"
-        ],
+        Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:GetObjectTagging"]
         
         Resource = [
           "arn:aws:s3:::medicare-pipeline-tf-state-cjk-2026/*",
@@ -228,186 +210,226 @@ resource "aws_iam_policy" "github_apply_policy" {
         ]
       },
       {
-        "Sid": "EC2InstanceManagementPermissions",
-        "Effect": "Allow",
-        "Action": [
-          "ec2:RunInstances", "ec2:TerminateInstances", "ec2:DescribeInstanceAttribute",
-          "ec2:ModifyInstanceAttribute", "ec2:CreateTags", "ec2:DescribeTags",
-          "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup", "ec2:DescribeSecurityGroups",
-          "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress",
-          "ec2:DescribeSubnets", "ec2:DescribeVpcs", "ec2:DescribeImages"
-        ],
-        "Resource": "*"
+        Sid      = "SecretsManagerAirflowSecretPermissions"
+        
+        Effect   = "Allow"
+        
+        Action   = ["secretsmanager:CreateSecret", "secretsmanager:DescribeSecret", "secretsmanager:TagResource", "secretsmanager:DeleteSecret", "secretsmanager:GetResourcePolicy"]
+        
+        Resource = "arn:aws:secretsmanager:us-east-1:440107864885:secret:medicare-cms/airflow_api_creds-*"
       },
       {
-        Sid = "Ec2SSMDescribePermissions",
+        Sid      = "SecretsManagerGdriveSecretReadPermissions"
         
-        Effect = "Allow",
+        Effect   = "Allow"
         
-        Action= [
-          "ec2:DescribeInstances",
-          "ec2:DescribeInstanceStatus",
-          "ssm:DescribeInstanceInformation",
-          "ec2:DescribeImages",
-          "ec2:DescribeVpcs",
-          "ec2:DescribeVpcAttribute"
-        ],
+        Action   = ["secretsmanager:DescribeSecret", "secretsmanager:GetResourcePolicy"]
+        
+        Resource = "arn:aws:secretsmanager:us-east-1:440107864885:secret:medicare_roject_gdrive_credentials*"
+      }
+    ]
+  })
 
-        Resource = "*"
-      },
-      {
-        Effect:"Allow",
-        Action:"ssm:SendCommand",
-        Resource:[
-            "arn:aws:ec2:us-east-1:440107864885:instance/*",
-            "arn:aws:ssm:us-east-1:440107864885:document/AWS-RunShellScript"
-        ]
-      },     
-      {
-        Sid = "GitHubECRTokenPermissions"
-        
-        Effect = "Allow"
-        
-        Action = ["ecr:GetAuthorizationToken"]
-        
-        Resource = "*"
-      },
-      {
-        Sid: "ECRRepositoryManagementPermissions",
-        
-        Effect: "Allow",
-        
-        Action: [
-          "ecr:CreateRepository",
-          "ecr:DescribeRepositories",
-          "ecr:DeleteRepository",
-          "ecr:TagResource",
-          "ecr:PutImageTagMutability",
-          "ecr:PutImageScanningConfiguration",
-          "ecr:GetLifecyclePolicy",
-          "ecr:PutLifecyclePolicy",
-          "ecr:DeleteLifecyclePolicy",
-          "ecr:ListTagsForResource"
-        ],
+  tags = {
+    DEALabs = "MedicareProject"
+  }
+}
 
-        "Resource": "arn:aws:ecr:us-east-1:440107864885:repository/cms-proj-streamlit"
-      },
+resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
+  
+  name = "github_apply_ec2_ssm_policy"
+
+  policy = jsonencode({
+    
+    Version = "2012-10-17"
+    
+    Statement = [
       {
-        Sid = "GitHubECRPushPermissions"
+        Sid    = "EC2InstanceManagementPermissions"
         
         Effect = "Allow"
         
         Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload",
-          "ecr:PutImage"
+          "ec2:RunInstances", "ec2:TerminateInstances", "ec2:DescribeInstanceAttribute",
+          "ec2:ModifyInstanceAttribute", "ec2:CreateTags", "ec2:DescribeTags",
+          "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup", "ec2:DescribeSecurityGroups",
+          "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress",
+          "ec2:DescribeSubnets", "ec2:DescribeVpcs", "ec2:DescribeImages",
+          "ec2:DescribeInstanceTypes"
         ]
         
+        Resource = "*"
+      },
+      {
+        Sid    = "Ec2SSMDescribePermissions"
+        
+        Effect = "Allow"
+        
+        Action = [
+          "ec2:DescribeInstances", "ec2:DescribeInstanceStatus", "ssm:DescribeInstanceInformation",
+          "ec2:DescribeImages", "ec2:DescribeVpcs", "ec2:DescribeVpcAttribute"
+        ]
+        
+        Resource = "*"
+      },
+      {
+        Sid    = "SSMSendCommandPermission"
+        
+        Effect = "Allow"
+        
+        Action = "ssm:SendCommand"
+        
+        Resource = [
+          "arn:aws:ec2:us-east-1:440107864885:instance/*",
+          "arn:aws:ssm:us-east-1:440107864885:document/AWS-RunShellScript"
+        ]
+      }
+    ]
+  })
+
+  tags = {
+    DEALabs = "MedicareProject"
+  }
+}
+
+resource "aws_iam_policy" "github_apply_ecr_ecs_lambda_policy" {
+  
+  name = "github_apply_ecr_ecs_lambda_policy"
+
+  policy = jsonencode({
+    
+    Version = "2012-10-17"
+    
+    Statement = [
+      {
+        Sid      = "GitHubECRTokenPermissions"
+        
+        Effect   = "Allow"
+        
+        Action   = ["ecr:GetAuthorizationToken"]
+        
+        Resource = "*"
+      },
+      {
+        Sid    = "ECRRepositoryManagementPermissions"
+        
+        Effect = "Allow"
+        
+        Action = [
+          "ecr:CreateRepository", "ecr:DescribeRepositories", "ecr:DeleteRepository",
+          "ecr:TagResource", "ecr:PutImageTagMutability", "ecr:PutImageScanningConfiguration",
+          "ecr:GetLifecyclePolicy", "ecr:PutLifecyclePolicy", "ecr:DeleteLifecyclePolicy",
+          "ecr:ListTagsForResource"
+        ]
+
+        Resource = "arn:aws:ecr:us-east-1:440107864885:repository/cms-proj-streamlit"
+      },
+      {
+        Sid    = "GitHubECRPushPermissions"
+        
+        Effect = "Allow"
+        
+        Action = [
+          "ecr:BatchCheckLayerAvailability", "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart", "ecr:CompleteLayerUpload", "ecr:PutImage"
+        ]
         Resource = aws_ecr_repository.cms_proj_streamlit.arn
       },
       {
-        Sid: "ECSExpressModeManagement",
+        Sid    = "ECSExpressModeManagement"
         
-        Effect: "Allow",
+        Effect = "Allow"
         
-        Action: [
-          "ecs:CreateExpressGatewayService",
-          "ecs:UpdateExpressGatewayService",
-          "ecs:DeleteExpressGatewayService",
-          "ecs:DescribeServices",
-          "ecs:ListServices"
-        ],
-        
-        Resource: "arn:aws:ecs:*:*:service/*/*"
+        Action = [
+          "ecs:CreateExpressGatewayService", "ecs:UpdateExpressGatewayService",
+          "ecs:DeleteExpressGatewayService", "ecs:DescribeExpressGatewayService",
+          "ecs:DescribeServices", "ecs:ListServices"
+        ]
+
+        Resource = "arn:aws:ecs:*:*:service/*/*"
       },
       {
-        "Sid": "LambdaFunctionManagementPermissions",
+        Sid    = "LambdaFunctionManagementPermissions"
         
-        "Effect": "Allow",
+        Effect = "Allow"
         
-        "Action": [
-          "lambda:CreateFunction",
-          "lambda:GetFunction",
-          "lambda:GetFunctionConfiguration",
-          "lambda:UpdateFunctionCode",
-          "lambda:UpdateFunctionConfiguration",
-          "lambda:DeleteFunction",
-          "lambda:TagResource",
-          "lambda:ListVersionsByFunction"
-        ],
+        Action = [
+          "lambda:CreateFunction", "lambda:GetFunction", "lambda:GetFunctionConfiguration",
+          "lambda:UpdateFunctionCode", "lambda:UpdateFunctionConfiguration", "lambda:DeleteFunction",
+          "lambda:TagResource", "lambda:ListVersionsByFunction", "lambda:GetFunctionCodeSigningConfig"
+        ]
         
-        "Resource": "arn:aws:lambda:us-east-1:440107864885:function:move_gdrive_files_to_s3"
+        Resource = "arn:aws:lambda:us-east-1:440107864885:function:move_gdrive_files_to_s3"
       },
       {
-        "Sid": "LambdaLayerManagementPermissions",
+        Sid    = "LambdaLayerManagementPermissions"
         
-        "Effect": "Allow",
+        Effect = "Allow"
         
-        "Action": [
-          "lambda:PublishLayerVersion",
-          "lambda:GetLayerVersion",
-          "lambda:DeleteLayerVersion",
-          "lambda:ListLayerVersions"
-        ],
+        Action = ["lambda:PublishLayerVersion", "lambda:GetLayerVersion", "lambda:DeleteLayerVersion", "lambda:ListLayerVersions"]
         
-        "Resource": "arn:aws:lambda:us-east-1:440107864885:layer:google-api-dependencies:*"
-      },
+        Resource = "arn:aws:lambda:us-east-1:440107864885:layer:google-api-dependencies:*"
+      }
+    ]
+  })
+
+  tags = {
+    DEALabs = "MedicareProject"
+  }
+}
+
+resource "aws_iam_policy" "github_apply_iam_glue_policy" {
+  
+  name = "github_apply_iam_glue_policy"
+
+  policy = jsonencode({
+    
+    Version = "2012-10-17"
+    
+    Statement = [
       {
-        Sid: "AllowPassRolesToECSExpress",
+        Sid    = "AllowPassRolesToECSExpress"
         
-        Effect: "Allow",
+        Effect = "Allow"
         
-        Action: [
-          "iam:PassRole"
-        ],
+        Action = ["iam:PassRole"]
         
-        Resource: [
+        Resource = [
           "arn:aws:iam::*:role/ecs_streamlit_s3_role",
           "arn:aws:iam::*:role/ecs_streamlit_ecr_role",
           "arn:aws:iam::*:role/ecs_express_infra_role"
-        ],
-
-        Condition: {
-          
-          StringEquals: {
-            "iam:PassedToService": [
-              "ecs.amazonaws.com",
-              "ecs-tasks.amazonaws.com",
-              "express.ecs.amazonaws.com"
-            ]
+        ]
+        
+        Condition = {
+          StringEquals = {
+            "iam:PassedToService" = ["ecs.amazonaws.com", "ecs-tasks.amazonaws.com", "express.ecs.amazonaws.com"]
           }
         }
       },
       {
-        "Sid": "GlueJobManagementPermissions",
-        "Effect": "Allow",
-        "Action": [
-          "glue:CreateJob",
-          "glue:GetJob",
-          "glue:GetJobs",
-          "glue:UpdateJob",
-          "glue:DeleteJob",
-          "glue:TagResource"
-        ],
-        "Resource": [
+        Sid    = "GlueJobManagementPermissions"
+        
+        Effect = "Allow"
+        
+        Action = ["glue:CreateJob", "glue:GetJob", "glue:GetJobs", "glue:UpdateJob", "glue:DeleteJob", "glue:TagResource", "glue:GetTags"]
+        
+        Resource = [
           "arn:aws:glue:us-east-1:440107864885:job/cms_proj_raw_to_silver_glue_job",
           "arn:aws:glue:us-east-1:440107864885:job/cms_proj_silver_to_gold_glue_job"
         ]
       },
       {
-        "Sid": "IAMRoleManagementPermissions",
+        Sid    = "IAMRoleManagementPermissions"
         
-        "Effect": "Allow",
+        Effect = "Allow"
         
-        "Action": [
+        Action = [
           "iam:CreateRole", "iam:GetRole", "iam:UpdateRole", "iam:UpdateAssumeRolePolicy",
           "iam:DeleteRole", "iam:TagRole", "iam:ListRolePolicies", "iam:ListAttachedRolePolicies",
           "iam:AttachRolePolicy", "iam:DetachRolePolicy"
-        ],
+        ]
         
-        "Resource": [
+        Resource = [
           "arn:aws:iam::440107864885:role/github_*",
           "arn:aws:iam::440107864885:role/cms_proj_*",
           "arn:aws:iam::440107864885:role/ecs_*",
@@ -415,15 +437,13 @@ resource "aws_iam_policy" "github_apply_policy" {
         ]
       },
       {
-        "Sid": "IAMPolicyManagementPermissions",
+        Sid    = "IAMPolicyManagementPermissions"
         
-        "Effect": "Allow",
+        Effect = "Allow"
         
-        "Action": [
-          "iam:CreatePolicy", "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions",
-          "iam:CreatePolicyVersion", "iam:DeletePolicyVersion", "iam:DeletePolicy", "iam:TagPolicy"
-        ],
-        "Resource": [
+        Action = ["iam:CreatePolicy", "iam:GetPolicy", "iam:GetPolicyVersion", "iam:ListPolicyVersions", "iam:CreatePolicyVersion", "iam:DeletePolicyVersion", "iam:DeletePolicy", "iam:TagPolicy"]
+        
+        Resource = [
           "arn:aws:iam::440107864885:policy/github_*",
           "arn:aws:iam::440107864885:policy/cms_proj_*",
           "arn:aws:iam::440107864885:policy/ecs_*",
@@ -431,52 +451,27 @@ resource "aws_iam_policy" "github_apply_policy" {
         ]
       },
       {
-        "Sid": "IAMInstanceProfileManagementPermissions",
+        Sid    = "IAMInstanceProfileManagementPermissions"
         
-        "Effect": "Allow",
+        Effect = "Allow"
         
-        "Action": [
-          "iam:CreateInstanceProfile", "iam:GetInstanceProfile", "iam:DeleteInstanceProfile",
-          "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "iam:TagInstanceProfile"
-        ],
+        Action = ["iam:CreateInstanceProfile", "iam:GetInstanceProfile", "iam:DeleteInstanceProfile", "iam:AddRoleToInstanceProfile", "iam:RemoveRoleFromInstanceProfile", "iam:TagInstanceProfile"]
         
-        "Resource": "arn:aws:iam::440107864885:instance-profile/*"
+        Resource = "arn:aws:iam::440107864885:instance-profile/*"
       },
       {
-        "Sid": "IAMOIDCProviderReadPermissions",
+        Sid      = "IAMOIDCProviderReadPermissions"
         
-        "Effect": "Allow",
+        Effect   = "Allow"
         
-        "Action": ["iam:GetOpenIDConnectProvider"],
+        Action   = ["iam:GetOpenIDConnectProvider"]
         
-        "Resource": "arn:aws:iam::440107864885:oidc-provider/token.actions.githubusercontent.com"
-      },
-      {
-        "Sid": "SecretsManagerAirflowSecretPermissions",
-        
-        "Effect": "Allow",
-        
-        "Action": [
-          "secretsmanager:CreateSecret", "secretsmanager:DescribeSecret",
-          "secretsmanager:TagResource", "secretsmanager:DeleteSecret",
-          "secretsmanager:GetResourcePolicy"
-        ],
-
-        "Resource": "arn:aws:secretsmanager:us-east-1:440107864885:secret:medicare-cms/airflow_api_creds-*"
-      },
-      {
-        "Sid": "SecretsManagerGdriveSecretReadPermissions",
-        
-        "Effect": "Allow",
-        
-        "Action": ["secretsmanager:DescribeSecret", "secretsmanager:GetResourcePolicy"],
-        
-        "Resource": "arn:aws:secretsmanager:us-east-1:440107864885:secret:medicare_roject_gdrive_credentials*"
+        Resource = "arn:aws:iam::440107864885:oidc-provider/token.actions.githubusercontent.com"
       }
     ]
   })
 
-  tags= {
+  tags = {
     DEALabs = "MedicareProject"
   }
 }
@@ -590,12 +585,39 @@ resource "aws_iam_role_policy_attachment" "github_dev_env_plan_policy_attachment
 
 
 
-resource "aws_iam_role_policy_attachment" "github_apply_role_policy_attachment"{
+resource "aws_iam_role_policy_attachment" "github_apply_storage_secrets_attachment" {
   
-  role = aws_iam_role.github_apply_role.name
+  role       = aws_iam_role.github_apply_role.name
   
-  policy_arn = aws_iam_policy.github_apply_policy.arn
-} 
+  policy_arn = aws_iam_policy.github_apply_storage_secrets_policy.arn
+}
+
+
+
+resource "aws_iam_role_policy_attachment" "github_apply_ec2_ssm_attachment" {
+  
+  role       = aws_iam_role.github_apply_role.name
+  
+  policy_arn = aws_iam_policy.github_apply_ec2_ssm_policy.arn
+}
+
+
+
+resource "aws_iam_role_policy_attachment" "github_apply_ecr_ecs_lambda_attachment" {
+  
+  role       = aws_iam_role.github_apply_role.name
+  
+  policy_arn = aws_iam_policy.github_apply_ecr_ecs_lambda_policy.arn
+}
+
+
+
+resource "aws_iam_role_policy_attachment" "github_apply_iam_glue_attachment" {
+  
+  role       = aws_iam_role.github_apply_role.name
+  
+  policy_arn = aws_iam_policy.github_apply_iam_glue_policy.arn
+}
 
 
 
