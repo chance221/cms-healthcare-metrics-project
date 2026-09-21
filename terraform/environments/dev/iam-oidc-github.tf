@@ -282,7 +282,7 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
         
         Resource = [
           "arn:aws:ec2:us-east-1:440107864885:instance/*",
-          "arn:aws:ssm:us-east-1:440107864885::document/AWS-RunShellScript"
+          "arn:aws:ssm:us-east-1::document/AWS-RunShellScript"
         ]
       }
     ]
