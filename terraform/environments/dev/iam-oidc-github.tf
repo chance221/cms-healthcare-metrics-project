@@ -369,7 +369,10 @@ resource "aws_iam_policy" "github_apply_ecr_ecs_lambda_policy" {
         
         Action = ["lambda:PublishLayerVersion", "lambda:GetLayerVersion", "lambda:DeleteLayerVersion", "lambda:ListLayerVersions"]
         
-        Resource = "arn:aws:lambda:us-east-1:440107864885:layer:google-api-dependencies:*"
+        Resource = [
+          "arn:aws:lambda:us-east-1:440107864885:layer:google-api-dependencies",
+          "arn:aws:lambda:us-east-1:440107864885:layer:google-api-dependencies:*"          
+        ]
       }
     ]
   })
@@ -468,6 +471,22 @@ resource "aws_iam_policy" "github_apply_iam_glue_policy" {
         Action   = ["iam:GetOpenIDConnectProvider"]
         
         Resource = "arn:aws:iam::440107864885:oidc-provider/token.actions.githubusercontent.com"
+      },
+      {
+        "Sid": "AllowPassRoleToEC2Airflow",
+        
+        "Effect": "Allow",
+        
+        "Action": ["iam:PassRole"],
+        
+        "Resource": "arn:aws:iam::440107864885:role/ec2_airflow_role",
+        
+        "Condition": {
+          
+          "StringEquals": {
+            "iam:PassedToService": "ec2.amazonaws.com"
+          }
+        }
       }
     ]
   })
