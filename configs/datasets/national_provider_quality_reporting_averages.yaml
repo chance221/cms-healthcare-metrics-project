@@ -1,0 +1,36 @@
+dataset_name: national_provider_quality_reporting_averages
+
+description: "National Provider Quality Reporting Aggregate Data Extract"
+
+raw:
+  prefix_pattern: "{env}/01-raw/{period}/*Quality_Reporting_Program_National_Data*.csv.gz"
+  format: csv
+
+
+primary_key: [ccn, measure_code, start_date, end_date]
+
+# Just using for right now since no other column can be used to determine tie breaker
+# on which record to use. In real life would add a warning if duplicate records existed
+# in the same run and send a notification but complete the job and update as needed
+
+dedup_order_by: score
+
+delete_missing_keys: false
+
+# Silver writes are partitioned by measurement_period (derived from end_date,
+# YYYYQ# — the quarter the measurement window ends in), not by the ingestion
+# --period argument. See raw_to_silver.py's derive_measurement_period().
+partition_source_column: end_date
+
+schema:
+  - { name: ccn, type: string, nullable: false, expected_raw_header: "CMS Certification Number (CCN)" }
+  - { name: measure_code, type: string, nullable: false, expected_raw_header: "Measure Code" }
+  - { name: score, type: double, nullable: true, expected_raw_header: "Score" }
+  - { name: footnote, type: string, nullable: true, expected_raw_header: "Footnote" }
+  - { name: start_date, type: string, nullable: false, expected_raw_header: "Start Date" }
+  - { name: end_date, type: string, nullable: false, expected_raw_header: "End Date" }
+  - { name: measure_date_range, type: string, nullable: true, expected_raw_header: "Measure Date Range" }
+
+
+silver:
+  output_path: "{env}/02-silver/national_provider_quality_reporting_averages"

@@ -1,0 +1,6 @@
+env: "prod"
+s3_bucket: medicare-cms-data-cjk-2026
+# Only meaningful for local dev — dev/prod run under IAM roles (EC2/Glue), not a named profile.
+aws_profile: "medicare-local-dev"
+spark_master: null
+write_strategy: "aws"

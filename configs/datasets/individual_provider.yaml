@@ -1,0 +1,124 @@
+dataset_name: individual_provider
+description: "Skilled Nursing Facility roster extract"
+raw:
+  prefix_pattern: "{env}/01-raw/{period}/*ProviderInfo*.csv.gz"
+  format: csv
+
+
+primary_key: [ccn]
+
+# No true "last updated" column exists in this file; using the
+# extract's own processing date as the recency signal for within-batch dedup.
+dedup_order_by: processing_date
+
+# If a CCN present in a prior silver load is absent from today's
+# extract, does that mean the facility closed (delete) or just a data gap (keep)?
+delete_missing_keys: false
+
+schema:
+  - { name: ccn, type: string, nullable: false, expected_raw_header: "CMS Certification Number (CCN)" }
+  - { name: provider_name, type: string, nullable: true, expected_raw_header: "Provider Name" }
+  - { name: provider_address, type: string, nullable: true, expected_raw_header: "Provider Address" }
+  - { name: city, type: string, nullable: true, expected_raw_header: "City/Town" }
+  - { name: state, type: string, nullable: true, expected_raw_header: "State" }
+  - { name: zip_code, type: string, nullable: true, expected_raw_header: "ZIP Code" }
+  - { name: telephone_number, type: string, nullable: true, expected_raw_header: "Telephone Number" }
+  - { name: ssa_county_code, type: string, nullable: true, expected_raw_header: "Provider SSA County Code" }
+  - { name: county, type: string, nullable: true, expected_raw_header: "County/Parish" }
+  - { name: ownership_type, type: string, nullable: true, expected_raw_header: "Ownership Type" }
+  - { name: certified_beds, type: int, nullable: true, expected_raw_header: "Number of Certified Beds" }
+  - { name: avg_residents_per_day, type: double, nullable: true, expected_raw_header: "Average Number of Residents per Day" }
+  - { name: avg_residents_per_day_footnote, type: string, nullable: true, expected_raw_header: "Average Number of Residents per Day Footnote" }
+  - { name: provider_type, type: string, nullable: true, expected_raw_header: "Provider Type" }
+  - { name: resides_in_hospital, type: string, nullable: true, expected_raw_header: "Provider Resides in Hospital" }
+  - { name: legal_business_name, type: string, nullable: true, expected_raw_header: "Legal Business Name" }
+  - { name: date_first_approved, type: timestamp, nullable: true, expected_raw_header: "Date First Approved to Provide Medicare and Medicaid Services" }
+  - { name: affiliated_entity_name, type: string, nullable: true, expected_raw_header: "Affiliated Entity Name" }
+  - { name: affiliated_entity_id, type: string, nullable: true, expected_raw_header: "Affiliated Entity ID" }
+  - { name: ccrc_status, type: string, nullable: true, expected_raw_header: "Continuing Care Retirement Community" }
+  - { name: special_focus_status, type: string, nullable: true, expected_raw_header: "Special Focus Status" }
+  - { name: abuse_icon, type: string, nullable: true, expected_raw_header: "Abuse Icon" }
+  - { name: health_inspection_over_2_years, type: string, nullable: true, expected_raw_header: "Most Recent Health Inspection More Than 2 Years Ago" }
+  - { name: ownership_changed_last_12_months, type: string, nullable: true, expected_raw_header: "Provider Changed Ownership in Last 12 Months" }
+  - { name: resident_family_council, type: string, nullable: true, expected_raw_header: "With a Resident and Family Council" }
+  - { name: automatic_sprinkler_systems, type: string, nullable: true, expected_raw_header: "Automatic Sprinkler Systems in All Required Areas" }
+  - { name: overall_rating, type: int, nullable: true, expected_raw_header: "Overall Rating" }
+  - { name: overall_rating_footnote, type: string, nullable: true, expected_raw_header: "Overall Rating Footnote" }
+  - { name: health_inspection_rating, type: int, nullable: true, expected_raw_header: "Health Inspection Rating" }
+  - { name: health_inspection_rating_footnote, type: string, nullable: true, expected_raw_header: "Health Inspection Rating Footnote" }
+  - { name: qm_rating, type: int, nullable: true, expected_raw_header: "QM Rating" }
+  - { name: qm_rating_footnote, type: string, nullable: true, expected_raw_header: "QM Rating Footnote" }
+  - { name: long_stay_qm_rating, type: int, nullable: true, expected_raw_header: "Long-Stay QM Rating" }
+  - { name: long_stay_qm_rating_footnote, type: string, nullable: true, expected_raw_header: "Long-Stay QM Rating Footnote" }
+  - { name: short_stay_qm_rating, type: int, nullable: true, expected_raw_header: "Short-Stay QM Rating" }
+  - { name: short_stay_qm_rating_footnote, type: string, nullable: true, expected_raw_header: "Short-Stay QM Rating Footnote" }
+  - { name: staffing_rating, type: int, nullable: true, expected_raw_header: "Staffing Rating" }
+  - { name: staffing_rating_footnote, type: string, nullable: true, expected_raw_header: "Staffing Rating Footnote" }
+  - { name: reported_staffing_footnote, type: string, nullable: true, expected_raw_header: "Reported Staffing Footnote" }
+  - { name: physical_therapist_staffing_footnote, type: string, nullable: true, expected_raw_header: "Physical Therapist Staffing Footnote" }
+  - { name: reported_nurse_aide_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Nurse Aide Staffing Hours per Resident per Day" }
+  - { name: reported_lpn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported LPN Staffing Hours per Resident per Day" }
+  - { name: reported_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported RN Staffing Hours per Resident per Day" }
+  - { name: reported_licensed_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Licensed Staffing Hours per Resident per Day" }
+  - { name: reported_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Total Nurse Staffing Hours per Resident per Day" }
+  - { name: weekend_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Total number of nurse staff hours per resident per day on the weekend" }
+  - { name: weekend_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Registered Nurse hours per resident per day on the weekend" }
+  - { name: reported_pt_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Physical Therapist Staffing Hours per Resident Per Day" }
+  - { name: total_nursing_staff_turnover, type: double, nullable: true, expected_raw_header: "Total nursing staff turnover" }
+  - { name: total_nursing_staff_turnover_footnote, type: string, nullable: true, expected_raw_header: "Total nursing staff turnover footnote" }
+  - { name: rn_turnover, type: double, nullable: true, expected_raw_header: "Registered Nurse turnover" }
+  - { name: rn_turnover_footnote, type: string, nullable: true, expected_raw_header: "Registered Nurse turnover footnote" }
+  - { name: administrators_departed_count, type: int, nullable: true, expected_raw_header: "Number of administrators who have left the nursing home" }
+  - { name: administrator_turnover_footnote, type: string, nullable: true, expected_raw_header: "Administrator turnover footnote" }
+  - { name: nursing_case_mix_index, type: double, nullable: true, expected_raw_header: "Nursing Case-Mix Index" }
+  - { name: nursing_case_mix_index_ratio, type: double, nullable: true, expected_raw_header: "Nursing Case-Mix Index Ratio" }
+  - { name: case_mix_nurse_aide_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix Nurse Aide Staffing Hours per Resident per Day" }
+  - { name: case_mix_lpn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix LPN Staffing Hours per Resident per Day" }
+  - { name: case_mix_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix RN Staffing Hours per Resident per Day" }
+  - { name: case_mix_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix Total Nurse Staffing Hours per Resident per Day" }
+  - { name: case_mix_weekend_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix Weekend Total Nurse Staffing Hours per Resident per Day" }
+  - { name: adjusted_nurse_aide_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Adjusted Nurse Aide Staffing Hours per Resident per Day" }
+  - { name: adjusted_lpn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Adjusted LPN Staffing Hours per Resident per Day" }
+  - { name: adjusted_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Adjusted RN Staffing Hours per Resident per Day" }
+  - { name: adjusted_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Adjusted Total Nurse Staffing Hours per Resident per Day" }
+  - { name: adjusted_weekend_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Adjusted Weekend Total Nurse Staffing Hours per Resident per Day" }
+  - { name: cycle1_survey_date, type: timestamp, nullable: true, expected_raw_header: "Rating Cycle 1 Standard Survey Health Date" }
+  - { name: cycle1_total_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 1 Total Number of Health Deficiencies" }
+  - { name: cycle1_standard_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 1 Number of Standard Health Deficiencies" }
+  - { name: cycle1_complaint_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 1 Number of Complaint Health Deficiencies" }
+  - { name: cycle1_health_deficiency_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 1 Health Deficiency Score" }
+  - { name: cycle1_health_revisits, type: int, nullable: true, expected_raw_header: "Rating Cycle 1 Number of Health Revisits" }
+  - { name: cycle1_health_revisit_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 1 Health Revisit Score" }
+  - { name: cycle1_total_health_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 1 Total Health Score" }
+  - { name: cycle2_survey_date, type: timestamp, nullable: true, expected_raw_header: "Rating Cycle 2 Standard Health Survey Date" }
+  - { name: cycle2_total_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 2 Total Number of Health Deficiencies" }
+  - { name: cycle2_standard_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 2 Number of Standard Health Deficiencies" }
+  - { name: cycle2_complaint_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 2 Number of Complaint Health Deficiencies" }
+  - { name: cycle2_health_deficiency_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 2 Health Deficiency Score" }
+  - { name: cycle2_health_revisits, type: int, nullable: true, expected_raw_header: "Rating Cycle 2 Number of Health Revisits" }
+  - { name: cycle2_health_revisit_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 2 Health Revisit Score" }
+  - { name: cycle2_total_health_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 2 Total Health Score" }
+  - { name: cycle3_survey_date, type: timestamp, nullable: true, expected_raw_header: "Rating Cycle 3 Standard Health Survey Date" }
+  - { name: cycle3_total_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 3 Total Number of Health Deficiencies" }
+  - { name: cycle3_standard_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 3 Number of Standard Health Deficiencies" }
+  - { name: cycle3_complaint_health_deficiencies, type: int, nullable: true, expected_raw_header: "Rating Cycle 3 Number of Complaint Health Deficiencies" }
+  - { name: cycle3_health_deficiency_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 3 Health Deficiency Score" }
+  - { name: cycle3_health_revisits, type: int, nullable: true, expected_raw_header: "Rating Cycle 3 Number of Health Revisits" }
+  - { name: cycle3_health_revisit_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 3 Health Revisit Score" }
+  - { name: cycle3_total_health_score, type: double, nullable: true, expected_raw_header: "Rating Cycle 3 Total Health Score" }
+  - { name: total_weighted_health_survey_score, type: double, nullable: true, expected_raw_header: "Total Weighted Health Survey Score" }
+  - { name: facility_reported_incidents, type: int, nullable: true, expected_raw_header: "Number of Facility Reported Incidents" }
+  - { name: substantiated_complaints, type: int, nullable: true, expected_raw_header: "Number of Substantiated Complaints" }
+  - { name: infection_control_citations, type: int, nullable: true, expected_raw_header: "Number of Citations from Infection Control Inspections" }
+  - { name: fines_count, type: int, nullable: true, expected_raw_header: "Number of Fines" }
+  - { name: total_fines_amount, type: double, nullable: true, expected_raw_header: "Total Amount of Fines in Dollars" }
+  - { name: payment_denials_count, type: int, nullable: true, expected_raw_header: "Number of Payment Denials" }
+  - { name: total_penalties, type: int, nullable: true, expected_raw_header: "Total Number of Penalties" }
+  - { name: location, type: string, nullable: true, expected_raw_header: "Location" }
+  - { name: latitude, type: double, nullable: true, expected_raw_header: "Latitude" }
+  - { name: longitude, type: double, nullable: true, expected_raw_header: "Longitude" }
+  - { name: geocoding_footnote, type: string, nullable: true, expected_raw_header: "Geocoding Footnote" }
+  - { name: processing_date, type: timestamp, nullable: true, expected_raw_header: "Processing Date" }
+
+silver:
+  output_path: "{env}/02-silver/individual_provider"

@@ -1,0 +1,68 @@
+dataset_name: national_provider_averages
+
+description: "National Provider Aggregate Data Extract"
+
+raw:
+  prefix_pattern: "{env}/01-raw/{period}/*StateUSAverages*.csv.gz"
+  format: csv
+
+
+primary_key: [state]
+
+dedup_order_by: processing_date
+
+delete_missing_keys: false
+
+schema:
+  - { name: state, type: string, nullable: false, expected_raw_header: "State or Nation" }
+  - { name: cycle1_avg_health_deficiencies, type: double, nullable: true, expected_raw_header: "Cycle 1 Total Number of Health Deficiencies" }
+  - { name: cycle1_avg_fire_safety_deficiencies, type: double, nullable: true, expected_raw_header: "Cycle 1 Total Number of Fire Safety Deficiencies" }
+  - { name: cycle2_avg_health_deficiencies, type: double, nullable: true, expected_raw_header: "Cycle 2 Total Number of Health Deficiencies" }
+  - { name: cycle2_avg_fire_safety_deficiencies, type: double, nullable: true, expected_raw_header: "Cycle 2 Total Number of Fire Safety Deficiencies" }
+  - { name: cycle3_avg_health_deficiencies, type: double, nullable: true, expected_raw_header: "Cycle 3 Total Number of Health Deficiencies" }
+  - { name: cycle3_avg_fire_safety_deficiencies, type: double, nullable: true, expected_raw_header: "Cycle 3 Total Number of Fire Safety Deficiencies" }
+  - { name: avg_residents_per_day, type: double, nullable: true, expected_raw_header: "Average Number of Residents per Day" }
+  - { name: reported_nurse_aide_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Nurse Aide Staffing Hours per Resident per Day" }
+  - { name: reported_lpn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported LPN Staffing Hours per Resident per Day" }
+  - { name: reported_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported RN Staffing Hours per Resident per Day" }
+  - { name: reported_licensed_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Licensed Staffing Hours per Resident per Day" }
+  - { name: reported_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Total Nurse Staffing Hours per Resident per Day" }
+  - { name: weekend_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Total number of nurse staff hours per resident per day on the weekend" }
+  - { name: weekend_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Registered Nurse hours per resident per day on the weekend" }
+  - { name: reported_pt_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Reported Physical Therapist Staffing Hours per Resident Per Day" }
+  - { name: total_nursing_staff_turnover, type: double, nullable: true, expected_raw_header: "Total nursing staff turnover" }
+  - { name: rn_turnover, type: double, nullable: true, expected_raw_header: "Registered Nurse turnover" }
+  - { name: avg_administrators_departed, type: double, nullable: true, expected_raw_header: "Number of administrators who have left the nursing home" }
+  - { name: nursing_case_mix_index, type: double, nullable: true, expected_raw_header: "Nursing Case-Mix Index" }
+  - { name: case_mix_rn_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix RN Staffing Hours per Resident per Day" }
+  - { name: case_mix_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix Total Nurse Staffing Hours per Resident per Day" }
+  - { name: case_mix_weekend_total_nurse_hours_per_resident_day, type: double, nullable: true, expected_raw_header: "Case-Mix Weekend Total Nurse Staffing Hours per Resident per Day" }
+  - { name: avg_number_of_fines, type: double, nullable: true, expected_raw_header: "Number of Fines" }
+  - { name: avg_fine_amount_dollars, type: double, nullable: true, expected_raw_header: "Fine Amount in Dollars" }
+  - { name: pct_long_stay_adl_help_increased, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents whose need for help with daily activities has increased" }
+  - { name: pct_long_stay_weight_loss, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents who lose too much weight" }
+  - { name: pct_long_stay_low_risk_incontinence, type: double, nullable: true, expected_raw_header: "Percentage of low risk long stay residents who lose control of their bowels or bladder" }
+  - { name: pct_long_stay_catheter, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents with a catheter inserted and left in their bladder" }
+  - { name: pct_long_stay_uti, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents with a urinary tract infection" }
+  - { name: pct_long_stay_depressive_symptoms, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents who have depressive symptoms" }
+  - { name: pct_long_stay_physically_restrained, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents who were physically restrained" }
+  - { name: pct_long_stay_falls_major_injury, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents experiencing one or more falls with major injury" }
+  - { name: pct_long_stay_pneumococcal_vaccine, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents assessed and appropriately given the pneumococcal vaccine" }
+  - { name: pct_long_stay_antipsychotic_med, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents who received an antipsychotic medication" }
+  - { name: pct_short_stay_pneumococcal_vaccine, type: double, nullable: true, expected_raw_header: "Percentage of short stay residents assessed and appropriately given the pneumococcal vaccine" }
+  - { name: pct_short_stay_new_antipsychotic_med, type: double, nullable: true, expected_raw_header: "Percentage of short stay residents who newly received an antipsychotic medication" }
+  - { name: pct_long_stay_mobility_worsened, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents whose ability to move independently worsened" }
+  - { name: pct_long_stay_antianxiety_hypnotic_med, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents who received an antianxiety or hypnotic medication" }
+  - { name: pct_long_stay_high_risk_pressure_ulcers, type: double, nullable: true, expected_raw_header: "Percentage of high risk long stay residents with pressure ulcers" }
+  - { name: pct_long_stay_influenza_vaccine, type: double, nullable: true, expected_raw_header: "Percentage of long stay residents assessed and appropriately given the seasonal influenza vaccine" }
+  - { name: pct_short_stay_function_improved, type: double, nullable: true, expected_raw_header: "Percentage of short stay residents who made improvements in function" }
+  - { name: pct_short_stay_influenza_vaccine, type: double, nullable: true, expected_raw_header: "Percentage of short stay residents who were assessed and appropriately given the seasonal influenza vaccine" }
+  - { name: pct_short_stay_rehospitalized, type: double, nullable: true, expected_raw_header: "Percentage of short stay residents who were rehospitalized after a nursing home admission" }
+  - { name: pct_short_stay_ed_visit, type: double, nullable: true, expected_raw_header: "Percentage of short stay residents who had an outpatient emergency department visit" }
+  - { name: hospitalizations_per_1000_long_stay_days, type: double, nullable: true, expected_raw_header: "Number of hospitalizations per 1000 long-stay resident days" }
+  - { name: ed_visits_per_1000_long_stay_days, type: double, nullable: true, expected_raw_header: "Number of outpatient emergency department visits per 1000 long-stay resident days" }
+  - { name: processing_date, type: timestamp, nullable: true, expected_raw_header: "Processing Date" }
+
+
+silver:
+  output_path: "{env}/02-silver/national_provider_averages"

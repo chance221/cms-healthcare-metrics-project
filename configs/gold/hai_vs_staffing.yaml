@@ -1,0 +1,15 @@
+gold_dataset_name: hai_vs_staffing
+
+description: "Facility healthcare-associated infection outcomes (S_039_01) vs. nurse staffing levels averaged over that measure's own reporting window, with national baselines for both."
+
+sources:
+  - provider_quality_reporting
+  - national_provider_quality_reporting_averages
+  - national_provider_averages
+
+gold_sources:
+  - facility_staffing_by_quarter
+
+transform_module: pyspark_jobs.gold_transforms.hai_vs_staffing
+
+output_path: "{env}/03-gold/hai_vs_staffing"

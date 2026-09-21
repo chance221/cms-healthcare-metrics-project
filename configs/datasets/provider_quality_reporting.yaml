@@ -1,0 +1,42 @@
+dataset_name: provider_quality_reporting
+
+description: "Provider Quality Reporting Data Extract"
+
+raw:
+  # TODO(confirm): guessing at the real CMS filename convention for this
+  # facility-level extract (counterpart to national_provider_quality_reporting_averages.yaml).
+  prefix_pattern: "{env}/01-raw/{period}/*Quality_Reporting_Program_Provider_Data*.csv.gz"
+  format: csv
+
+
+primary_key: [ccn, measure_code, start_date, end_date]
+
+dedup_order_by: score
+
+delete_missing_keys: false
+
+# Silver writes are partitioned by measurement_period (derived from end_date,
+# YYYYQ# — the quarter the measurement window ends in), not by the ingestion
+# --period argument. See raw_to_silver.py's derive_measurement_period().
+partition_source_column: end_date
+
+schema:
+  - { name: ccn, type: string, nullable: false, expected_raw_header: "CMS Certification Number (CCN)" }
+  - { name: provider_name, type: string, nullable: true, expected_raw_header: "Provider Name" }
+  - { name: address_line_1, type: string, nullable: true, expected_raw_header: "Address Line 1" }
+  - { name: city, type: string, nullable: true, expected_raw_header: "City/Town" }
+  - { name: state, type: string, nullable: true, expected_raw_header: "State" }
+  - { name: zip_code, type: string, nullable: true, expected_raw_header: "ZIP Code" }
+  - { name: county, type: string, nullable: true, expected_raw_header: "County/Parish" }
+  - { name: telephone_number, type: string, nullable: true, expected_raw_header: "Telephone Number" }
+  - { name: cms_region, type: string, nullable: true, expected_raw_header: "CMS Region" }
+  - { name: measure_code, type: string, nullable: false, expected_raw_header: "Measure Code" }
+  - { name: score, type: string, nullable: true, expected_raw_header: "Score" }
+  - { name: footnote, type: string, nullable: true, expected_raw_header: "Footnote" }
+  - { name: start_date, type: string, nullable: false, expected_raw_header: "Start Date" }
+  - { name: end_date, type: string, nullable: false, expected_raw_header: "End Date" }
+  - { name: measure_date_range, type: string, nullable: true, expected_raw_header: "Measure Date Range" }
+  - { name: location, type: string, nullable: true, expected_raw_header: "LOCATION1" }
+
+silver:
+  output_path: "{env}/02-silver/provider_quality_reporting"

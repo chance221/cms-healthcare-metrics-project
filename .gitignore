@@ -1,0 +1,44 @@
+# --- Secrets & credentials ---
+*.env
+*.env.*
+.env*
+**/gdrive_credentials*.json
+**/testClient1.json
+**/*credentials*.json
+**/*serviceaccount*.json
+**/*service_account*.json
+*.pem
+*.key
+
+# --- Terraform ---
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# --- Spark / data outputs (local test runs) ---
+data/
+*.parquet
+spark-warehouse/
+metastore_db/
+
+# --- IDE / OS ---
+.vscode/
+.DS_Store
+
+
+./claude
+
+#--- Terraform Build Artifacts
+terraform/environments/dev/*.zip

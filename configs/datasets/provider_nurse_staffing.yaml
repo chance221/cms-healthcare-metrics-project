@@ -1,0 +1,54 @@
+dataset_name: provider_nurse_staffing
+
+description: "Provider Nurse Staffing Data Extract"
+
+raw:
+  prefix_pattern: "{env}/01-raw/{period}/*PBJ_Daily_Nurse_Staffing*.csv.gz"
+  format: csv
+
+
+primary_key: [provnum, work_date]
+
+dedup_order_by: mds_census
+
+delete_missing_keys: false
+
+ignore_extra_columns: [incomplete]
+
+schema:
+  - { name: provnum, type: string, nullable: false, expected_raw_header: "PROVNUM" }
+  - { name: provider_name, type: string, nullable: true, expected_raw_header: "PROVNAME" }
+  - { name: city, type: string, nullable: true, expected_raw_header: "CITY" }
+  - { name: state, type: string, nullable: true, expected_raw_header: "STATE" }
+  - { name: county_name, type: string, nullable: true, expected_raw_header: "COUNTY_NAME" }
+  - { name: county_fips, type: string, nullable: true, expected_raw_header: "COUNTY_FIPS" }
+  - { name: cy_quarter, type: string, nullable: true, expected_raw_header: "CY_Qtr" }
+  - { name: work_date, type: string, nullable: false, expected_raw_header: "WorkDate" }
+  - { name: mds_census, type: int, nullable: true, expected_raw_header: "MDScensus" }
+  - { name: hrs_rn_director_of_nursing, type: double, nullable: true, expected_raw_header: "Hrs_RNDON" }
+  - { name: hrs_rn_director_of_nursing_emp, type: double, nullable: true, expected_raw_header: "Hrs_RNDON_emp" }
+  - { name: hrs_rn_director_of_nursing_ctr, type: double, nullable: true, expected_raw_header: "Hrs_RNDON_ctr" }
+  - { name: hrs_rn_admin, type: double, nullable: true, expected_raw_header: "Hrs_RNadmin" }
+  - { name: hrs_rn_admin_emp, type: double, nullable: true, expected_raw_header: "Hrs_RNadmin_emp" }
+  - { name: hrs_rn_admin_ctr, type: double, nullable: true, expected_raw_header: "Hrs_RNadmin_ctr" }
+  - { name: hrs_rn_staff, type: double, nullable: true, expected_raw_header: "Hrs_RN" }
+  - { name: hrs_rn_staff_emp, type: double, nullable: true, expected_raw_header: "Hrs_RN_emp" }
+  - { name: hrs_rn_staff_ctr, type: double, nullable: true, expected_raw_header: "Hrs_RN_ctr" }
+  - { name: hrs_lpn_admin, type: double, nullable: true, expected_raw_header: "Hrs_LPNadmin" }
+  - { name: hrs_lpn_admin_emp, type: double, nullable: true, expected_raw_header: "Hrs_LPNadmin_emp" }
+  - { name: hrs_lpn_admin_ctr, type: double, nullable: true, expected_raw_header: "Hrs_LPNadmin_ctr" }
+  - { name: hrs_lpn, type: double, nullable: true, expected_raw_header: "Hrs_LPN" }
+  - { name: hrs_lpn_emp, type: double, nullable: true, expected_raw_header: "Hrs_LPN_emp" }
+  - { name: hrs_lpn_ctr, type: double, nullable: true, expected_raw_header: "Hrs_LPN_ctr" }
+  - { name: hrs_cna, type: double, nullable: true, expected_raw_header: "Hrs_CNA" }
+  - { name: hrs_cna_emp, type: double, nullable: true, expected_raw_header: "Hrs_CNA_emp" }
+  - { name: hrs_cna_ctr, type: double, nullable: true, expected_raw_header: "Hrs_CNA_ctr" }
+  - { name: hrs_na_trn, type: double, nullable: true, expected_raw_header: "Hrs_NAtrn" }
+  - { name: hrs_na_trn_emp, type: double, nullable: true, expected_raw_header: "Hrs_NAtrn_emp" }
+  - { name: hrs_na_trn_ctr, type: double, nullable: true, expected_raw_header: "Hrs_NAtrn_ctr" }
+  - { name: hrs_med_aide, type: double, nullable: true, expected_raw_header: "Hrs_MedAide" }
+  - { name: hrs_med_aide_emp, type: double, nullable: true, expected_raw_header: "Hrs_MedAide_emp" }
+  - { name: hrs_med_aide_ctr, type: double, nullable: true, expected_raw_header: "Hrs_MedAide_ctr" }
+
+silver:
+  output_path: "{env}/02-silver/provider_nurse_staffing"

@@ -1,0 +1,10 @@
+gold_dataset_name: facility_staffing_by_quarter
+
+description: "Facility nurse staffing levels aggregated to one row per provider per calendar quarter. Reusable fact table -- other gold datasets join to this via gold_sources instead of recomputing the aggregation from silver."
+
+sources:
+  - provider_nurse_staffing
+
+transform_module: pyspark_jobs.gold_transforms.facility_staffing_by_quarter
+
+output_path: "{env}/03-gold/facility_staffing_by_quarter"
