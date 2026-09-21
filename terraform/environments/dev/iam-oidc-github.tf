@@ -19,7 +19,7 @@ resource "aws_iam_role" "github_plan_role_dev"{
         "Condition": {
             "StringEquals": {
                 "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                "token.actions.githubusercontent.com:sub": "repo:chance221/cms-healthcare-metrics-project:pull_request"
+                "token.actions.githubusercontent.com:sub": "repo:chance221@39056884/cms-healthcare-metrics-project:pull_request"
             }
         }
       }
@@ -55,7 +55,7 @@ resource "aws_iam_role" "github_apply_role"{
         "Condition": {
             "StringEquals": {
                 "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                "token.actions.githubusercontent.com:sub": "repo:chance221/cms-healthcare-metrics-project:environment:production"
+                "token.actions.githubusercontent.com:sub": "repo:chance221@39056884/cms-healthcare-metrics-project:environment:production"
             }
         }
       }
@@ -89,7 +89,7 @@ resource "aws_iam_role" "github_build_role"{
         "Condition": {
             "StringEquals": {
                 "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                "token.actions.githubusercontent.com:sub": "repo:chance221/cms-healthcare-metrics-project/workflows/deploy.yml@refs/heads/main"
+                "token.actions.githubusercontent.com:sub": "repo:chance221@39056884/cms-healthcare-metrics-project/workflows/deploy.yml@refs/heads/main"
             }
         }
       }
