@@ -418,8 +418,6 @@ resource "aws_iam_policy" "github_build_policy" {
 
 
 
-
-
 resource "aws_iam_role_policy_attachment" "github_dev_env_plan_policy_attachment"{
   
   role = aws_iam_role.github_plan_role_dev.name
