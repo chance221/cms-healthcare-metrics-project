@@ -228,6 +228,18 @@ resource "aws_iam_policy" "github_apply_policy" {
         ]
       },
       {
+        "Sid": "EC2InstanceManagementPermissions",
+        "Effect": "Allow",
+        "Action": [
+          "ec2:RunInstances", "ec2:TerminateInstances", "ec2:DescribeInstanceAttribute",
+          "ec2:ModifyInstanceAttribute", "ec2:CreateTags", "ec2:DescribeTags",
+          "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup", "ec2:DescribeSecurityGroups",
+          "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress",
+          "ec2:DescribeSubnets", "ec2:DescribeVpcs", "ec2:DescribeImages"
+        ],
+        "Resource": "*"
+      },
+      {
         Sid = "Ec2SSMDescribePermissions",
         
         Effect = "Allow",
@@ -237,7 +249,8 @@ resource "aws_iam_policy" "github_apply_policy" {
           "ec2:DescribeInstanceStatus",
           "ssm:DescribeInstanceInformation",
           "ec2:DescribeImages",
-          "ec2:DescribeVpcs"
+          "ec2:DescribeVpcs",
+          "ec2:DescribeVpcAttribute"
         ],
 
         Resource = "*"
@@ -273,7 +286,8 @@ resource "aws_iam_policy" "github_apply_policy" {
           "ecr:PutImageScanningConfiguration",
           "ecr:GetLifecyclePolicy",
           "ecr:PutLifecyclePolicy",
-          "ecr:DeleteLifecyclePolicy"
+          "ecr:DeleteLifecyclePolicy",
+          "ecr:ListTagsForResource"
         ],
 
         "Resource": "arn:aws:ecr:us-east-1:440107864885:repository/cms-proj-streamlit"
@@ -365,6 +379,22 @@ resource "aws_iam_policy" "github_apply_policy" {
             ]
           }
         }
+      },
+      {
+        "Sid": "GlueJobManagementPermissions",
+        "Effect": "Allow",
+        "Action": [
+          "glue:CreateJob",
+          "glue:GetJob",
+          "glue:GetJobs",
+          "glue:UpdateJob",
+          "glue:DeleteJob",
+          "glue:TagResource"
+        ],
+        "Resource": [
+          "arn:aws:glue:us-east-1:440107864885:job/cms_proj_raw_to_silver_glue_job",
+          "arn:aws:glue:us-east-1:440107864885:job/cms_proj_silver_to_gold_glue_job"
+        ]
       },
       {
         "Sid": "IAMRoleManagementPermissions",
