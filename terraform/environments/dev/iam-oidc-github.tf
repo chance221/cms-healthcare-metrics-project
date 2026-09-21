@@ -253,9 +253,8 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
           "ec2:RunInstances", "ec2:TerminateInstances", "ec2:DescribeInstanceAttribute",
           "ec2:ModifyInstanceAttribute", "ec2:CreateTags", "ec2:DescribeTags",
           "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup", "ec2:DescribeSecurityGroups",
-          "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress",
-          "ec2:DescribeSubnets", "ec2:DescribeVpcs", "ec2:DescribeImages",
-          "ec2:DescribeInstanceTypes"
+          "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress"
+          
         ]
         
         Resource = "*"
@@ -267,7 +266,9 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
         
         Action = [
           "ec2:DescribeInstances", "ec2:DescribeInstanceStatus", "ssm:DescribeInstanceInformation",
-          "ec2:DescribeImages", "ec2:DescribeVpcs", "ec2:DescribeVpcAttribute"
+          "ec2:DescribeImages", "ec2:DescribeVpcs", "ec2:DescribeVpcAttribute", "ec2:DescribeVolumes",
+          "ec2:DescribeSubnets", "ec2:DescribeVpcs", "ec2:DescribeImages",
+          "ec2:DescribeInstanceTypes"
         ]
         
         Resource = "*"
