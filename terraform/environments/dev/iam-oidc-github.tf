@@ -268,7 +268,7 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
           "ec2:DescribeInstances", "ec2:DescribeInstanceStatus", "ssm:DescribeInstanceInformation",
           "ec2:DescribeImages", "ec2:DescribeVpcs", "ec2:DescribeVpcAttribute", "ec2:DescribeVolumes",
           "ec2:DescribeSubnets", "ec2:DescribeVpcs", "ec2:DescribeImages",
-          "ec2:DescribeInstanceTypes"
+          "ec2:DescribeInstanceTypes", "ec2:DescribeInstanceCreditSpecifications"
         ]
         
         Resource = "*"
