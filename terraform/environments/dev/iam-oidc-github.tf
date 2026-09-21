@@ -217,7 +217,8 @@ resource "aws_iam_policy" "github_apply_policy" {
         Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:GetObjectTagging"
         ],
         
         Resource = [
@@ -235,6 +236,8 @@ resource "aws_iam_policy" "github_apply_policy" {
           "ec2:DescribeInstances",
           "ec2:DescribeInstanceStatus",
           "ssm:DescribeInstanceInformation",
+          "ec2:DescribeImages",
+          "ec2:DescribeVpcs"
         ],
 
         Resource = "*"
@@ -425,7 +428,8 @@ resource "aws_iam_policy" "github_apply_policy" {
         
         "Action": [
           "secretsmanager:CreateSecret", "secretsmanager:DescribeSecret",
-          "secretsmanager:TagResource", "secretsmanager:DeleteSecret"
+          "secretsmanager:TagResource", "secretsmanager:DeleteSecret",
+          "secretsmanager:GetResourcePolicy"
         ],
 
         "Resource": "arn:aws:secretsmanager:us-east-1:440107864885:secret:medicare-cms/airflow_api_creds-*"
@@ -435,7 +439,7 @@ resource "aws_iam_policy" "github_apply_policy" {
         
         "Effect": "Allow",
         
-        "Action": ["secretsmanager:DescribeSecret"],
+        "Action": ["secretsmanager:DescribeSecret", "secretsmanager:GetResourcePolicy"],
         
         "Resource": "arn:aws:secretsmanager:us-east-1:440107864885:secret:medicare_roject_gdrive_credentials*"
       }
