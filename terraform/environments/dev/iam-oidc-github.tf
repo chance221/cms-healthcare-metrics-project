@@ -344,7 +344,7 @@ resource "aws_iam_policy" "github_apply_ecr_ecs_lambda_policy" {
         Action = [
           "ecs:CreateExpressGatewayService", "ecs:UpdateExpressGatewayService",
           "ecs:DeleteExpressGatewayService", "ecs:DescribeExpressGatewayService",
-          "ecs:DescribeServices", "ecs:ListServices"
+          "ecs:DescribeServices", "ecs:ListServices", ecs:RegisterTaskDefinition
         ]
 
         Resource = "arn:aws:ecs:*:*:service/*/*"
