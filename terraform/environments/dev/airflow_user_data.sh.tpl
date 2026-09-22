@@ -27,6 +27,7 @@ After=network.target
 
 [Service]
 Environment=AIRFLOW_HOME=/opt/airflow
+Environment=AWS_DEFAULT_REGION=us-east-1
 ExecStart=/usr/bin/python3.13 -m airflow standalone
 Restart=on-failure
 User=root

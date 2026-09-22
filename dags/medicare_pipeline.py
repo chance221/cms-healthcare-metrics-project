@@ -4,6 +4,7 @@ from airflow.models.param import Param
 from airflow.providers.amazon.aws.operators.glue import GlueJobOperator
 from airflow.providers.amazon.aws.operators.lambda_function import LambdaInvokeFunctionOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+import json
 
 RAW_TO_SILVER_GLUE_JOB = "cms_proj_raw_to_silver_glue_job"
 SILVER_TO_GOLD_GLUE_JOB = "cms_proj_silver_to_gold_glue_job"
@@ -26,7 +27,7 @@ with DAG(
         "dataset": Param("all", type="string"),
         "gold_dataset": Param("all", type="string"),
         "gdrive_folder_id": Param("", type="string"),
-        "file_name_contains": Param("", type="string"),
+        "file_name_contains": Param(None, type=["null", "string"]),
     },
 ) as dag:
 
@@ -34,20 +35,31 @@ with DAG(
     def should_ingest(**context):
         return context["params"]["run_ingest"]
 
+
+    @task
+    def build_ingestion_payload(**context):
+        p = context["params"]
+        payload = {
+            "period": p["period"],
+            "gdrive_folder_id": p["gdrive_folder_id"],
+            "env": p["env"],
+        }
+        if p["file_name_contains"]:
+            payload["file_name_contains"] = p["file_name_contains"]
+        return json.dumps(payload)
+
+    
     invoke_ingestion_lambda = LambdaInvokeFunctionOperator(
         task_id="invoke_ingestion_lambda",
         function_name=INGESTION_LAMBDA,
-        payload=(
-            '{"period": "{{ params.period }}", '
-            '"gdrive_folder_id": "{{ params.gdrive_folder_id }}", '
-            '"file_name_contains": "{{ params.file_name_contains }}", '
-            '"env": "{{ params.env }}"}'
-        ),
-    )
+        payload=build_ingestion_payload(),
+    )     
+
 
     @task.short_circuit(trigger_rule="none_failed_min_one_success")
     def should_raw_to_silver(**context):
         return context["params"]["run_raw_to_silver"]
+
 
     wait_for_raw_landing = S3KeySensor(
         task_id="wait_for_raw_landing",
