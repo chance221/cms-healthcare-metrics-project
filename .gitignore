@@ -9,6 +9,8 @@
 **/*service_account*.json
 *.pem
 *.key
+# certifi's CA bundle -- not a secret, needed in the lambda layer zip
+!**/certifi/cacert.pem
 
 # --- Terraform ---
 **/.terraform/*
