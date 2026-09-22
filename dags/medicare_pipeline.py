@@ -68,7 +68,7 @@ with DAG(
     wait_for_raw_landing = S3KeySensor(
         task_id="wait_for_raw_landing",
         bucket_name=DATA_BUCKET,
-        bucket_key="{{ params.env }}/01-raw/{{ params.period }}/",
+        bucket_key="{{ params.env }}/01-raw/{{ params.period }}/*",
         wildcard_match=True,
         timeout=60 * 30,
         poke_interval=30,

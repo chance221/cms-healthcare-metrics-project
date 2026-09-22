@@ -56,18 +56,38 @@ resource "aws_iam_policy" "ec2_airflow_run_policy" {
           aws_glue_job.cms_proj_silver_to_gold_glue_job.arn,
           aws_glue_job.cms_proj_raw_to_silver_glue_job.arn
         ]
-      },
+      },     
       {
         Sid = "AllowS3GetObject"
 
         Effect = "Allow"
 
         Action = [
-          "s3:GetObject"
+          "s3:GetObject",
+          "s3:PutObject"
         ]
 
         Resource = [
-          "${aws_s3_bucket.cms_proj_python_scripts.arn}/*"
+          "${aws_s3_bucket.cms_proj_python_scripts.arn}/*",
+          "${aws_s3_bucket.medicare_s3_data_lake.arn}/*"
+        ]
+      },
+      {
+        Sid    = "S3BucketReadPermissions"
+        
+        Effect = "Allow"
+        
+        Action = [
+          "s3:GetAccelerateConfiguration", "s3:GetBucketAcl", "s3:GetBucketCORS",
+          "s3:GetBucketLogging", "s3:GetBucketObjectLockConfiguration", "s3:GetBucketPolicy",
+          "s3:GetBucketPublicAccessBlock", "s3:GetBucketRequestPayment", "s3:GetBucketTagging",
+          "s3:GetBucketVersioning", "s3:GetBucketWebsite", "s3:GetEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration", "s3:GetReplicationConfiguration", "s3:ListBucket"
+        ]
+        
+        Resource = [
+          "arn:aws:s3:::medicare-cms-data-cjk-2026",
+          "arn:aws:s3:::cms-project-python-scripts-cjk-2026"
         ]
       }
     ]
