@@ -1,0 +1,200 @@
+name: Run pipeline on demand
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_ingest:
+        description: "Pull new files from Google Drive into raw"
+        type: boolean
+        default: true
+      run_raw_to_silver:
+        description: "Run the raw -> silver Glue job"
+        type: boolean
+        default: true
+      run_silver_to_gold:
+        description: "Run the silver -> gold Glue job"
+        type: boolean
+        default: true
+      env:
+        description: "Environment"
+        type: choice
+        options: [dev, prod]
+        default: dev
+      period:
+        description: "Reporting period, e.g. 2026Q3"
+        type: string
+        default: "2026Q3"
+      dataset:
+        description: "Raw->silver dataset name, or 'all'"
+        type: string
+        default: "all"
+      gold_dataset:
+        description: "Silver->gold dataset name, or 'all'"
+        type: string
+        default: "all"
+      gdrive_folder_id:
+        description: "Google Drive folder ID to pull from (only used if run_ingest is true)"
+        type: string
+        default: ""
+      file_name_contains:
+        description: "Optional substring filter for ingestion (leave blank for none)"
+        type: string
+        default: ""
+      stop_after:
+        description: "Stop the Airflow instance once the run finishes"
+        type: boolean
+        default: true
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AIRFLOW_URL: http://localhost:8080
+  DAG_ID: medicare_pipeline
+
+jobs:
+  run_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::440107864885:role/github_build_role
+          aws-region: us-east-1
+
+      - name: Install SSM Session Manager plugin
+        run: |
+          curl -s "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o session-manager-plugin.deb
+          sudo dpkg -i session-manager-plugin.deb
+
+      - name: Look up Airflow instance ID
+        run: |
+          INSTANCE_ID=$(aws ssm get-parameter \
+            --name /medicare-pipeline/airflow_instance_id \
+            --query 'Parameter.Value' --output text)
+          echo "INSTANCE_ID=$INSTANCE_ID" >> "$GITHUB_ENV"
+
+      - name: Start the instance
+        run: aws ec2 start-instances --instance-ids "$INSTANCE_ID"
+
+      - name: Wait for EC2 running state
+        run: aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+
+      - name: Wait for SSM agent online
+        run: |
+          for i in $(seq 1 30); do
+            STATUS=$(aws ssm describe-instance-information \
+              --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+              --query 'InstanceInformationList[0].PingStatus' --output text)
+            echo "SSM ping status: $STATUS"
+            if [ "$STATUS" = "Online" ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "SSM agent never came online."
+          exit 1
+
+      - name: Open SSM port-forwarding session to Airflow
+        run: |
+          nohup aws ssm start-session \
+            --target "$INSTANCE_ID" \
+            --document-name AWS-StartPortForwardingSession \
+            --parameters '{"portNumber":["8080"],"localPortNumber":["8080"]}' \
+            > ssm_session.log 2>&1 &
+          echo "SSM_SESSION_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Fetch Airflow API credentials
+        run: |
+          SECRET_JSON=$(aws secretsmanager get-secret-value \
+            --secret-id medicare-cms/airflow_api_creds \
+            --query SecretString --output text)
+          AIRFLOW_USERNAME=$(echo "$SECRET_JSON" | jq -r '.username')
+          AIRFLOW_PASSWORD=$(echo "$SECRET_JSON" | jq -r '.password')
+          echo "::add-mask::$AIRFLOW_PASSWORD"
+          echo "AIRFLOW_USERNAME=$AIRFLOW_USERNAME" >> "$GITHUB_ENV"
+          echo "AIRFLOW_PASSWORD=$AIRFLOW_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Wait for Airflow webserver and get a JWT
+        run: |
+          for i in $(seq 1 30); do
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$AIRFLOW_URL/auth/token" \
+              -H "Content-Type: application/json" \
+              -d "{\"username\": \"$AIRFLOW_USERNAME\", \"password\": \"$AIRFLOW_PASSWORD\"}")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
+            if [ "$HTTP_CODE" = "200" ]; then
+              TOKEN=$(echo "$BODY" | jq -r '.access_token')
+              echo "::add-mask::$TOKEN"
+              echo "TOKEN=$TOKEN" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            echo "Airflow not ready yet (http $HTTP_CODE), retrying..."
+            sleep 10
+          done
+          echo "Airflow webserver never became reachable through the tunnel."
+          exit 1
+
+      - name: Trigger the DAG run
+        run: |
+          CONF=$(jq -n \
+            --arg period "${{ inputs.period }}" \
+            --arg env "${{ inputs.env }}" \
+            --arg gdrive_folder_id "${{ inputs.gdrive_folder_id }}" \
+            --arg dataset "${{ inputs.dataset }}" \
+            --arg gold_dataset "${{ inputs.gold_dataset }}" \
+            --arg file_name_contains "${{ inputs.file_name_contains }}" \
+            --argjson run_ingest ${{ inputs.run_ingest }} \
+            --argjson run_raw_to_silver ${{ inputs.run_raw_to_silver }} \
+            --argjson run_silver_to_gold ${{ inputs.run_silver_to_gold }} \
+            '{
+              run_ingest: $run_ingest,
+              run_raw_to_silver: $run_raw_to_silver,
+              run_silver_to_gold: $run_silver_to_gold,
+              env: $env,
+              period: $period,
+              dataset: $dataset,
+              gold_dataset: $gold_dataset,
+              gdrive_folder_id: $gdrive_folder_id
+            } + (if $file_name_contains != "" then {file_name_contains: $file_name_contains} else {} end)')
+
+          RESPONSE=$(curl -s -X POST "$AIRFLOW_URL/api/v2/dags/$DAG_ID/dagRuns" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"conf\": $CONF}")
+
+          echo "Trigger response: $RESPONSE"
+          DAG_RUN_ID=$(echo "$RESPONSE" | jq -r '.dag_run_id')
+          if [ "$DAG_RUN_ID" = "null" ] || [ -z "$DAG_RUN_ID" ]; then
+            echo "Failed to trigger DAG run."
+            exit 1
+          fi
+          echo "DAG_RUN_ID=$DAG_RUN_ID" >> "$GITHUB_ENV"
+
+      - name: Poll the DAG run to completion
+        run: |
+          for i in $(seq 1 120); do
+            STATE=$(curl -s "$AIRFLOW_URL/api/v2/dags/$DAG_ID/dagRuns/$DAG_RUN_ID" \
+              -H "Authorization: Bearer $TOKEN" | jq -r '.state')
+            echo "DAG run state: $STATE"
+            if [ "$STATE" = "success" ] || [ "$STATE" = "failed" ]; then
+              echo "FINAL_STATE=$STATE" >> "$GITHUB_ENV"
+              break
+            fi
+            sleep 30
+          done
+
+          if [ "$FINAL_STATE" != "success" ]; then
+            echo "DAG run did not succeed (final state: ${FINAL_STATE:-timed out})"
+            exit 1
+          fi
+
+      - name: Close the SSM tunnel
+        if: always()
+        run: kill "$SSM_SESSION_PID" 2>/dev/null || true
+
+      - name: Stop the instance
+        if: always() && inputs.stop_after
+        run: aws ec2 stop-instances --instance-ids "$INSTANCE_ID"

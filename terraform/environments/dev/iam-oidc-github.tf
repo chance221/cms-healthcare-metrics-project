@@ -89,7 +89,7 @@ resource "aws_iam_role" "github_build_role"{
         "Condition": {
             "StringEquals": {
                 "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-                "token.actions.githubusercontent.com:sub": "repo:chance221@39056884/cms-healthcare-metrics-project/workflows/deploy.yml@refs/heads/main"
+                "token.actions.githubusercontent.com:sub": "repo:chance221@39056884/cms-healthcare-metrics-project@1371657610:ref:refs/heads/main"
             }
         }
       }
