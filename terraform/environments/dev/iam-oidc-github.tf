@@ -344,10 +344,22 @@ resource "aws_iam_policy" "github_apply_ecr_ecs_lambda_policy" {
         Action = [
           "ecs:CreateExpressGatewayService", "ecs:UpdateExpressGatewayService",
           "ecs:DeleteExpressGatewayService", "ecs:DescribeExpressGatewayService",
-          "ecs:DescribeServices", "ecs:ListServices", "ecs:RegisterTaskDefinition"
+          "ecs:DescribeServices", "ecs:ListServices"
         ]
 
         Resource = "arn:aws:ecs:*:*:service/*/*"
+      },
+      {
+        Sid    = "ECSExpressTaskDefinitionManagement"
+
+        Effect = "Allow"
+
+        Action = [
+          "ecs:RegisterTaskDefinition", "ecs:DescribeTaskDefinition",
+          "ecs:DeregisterTaskDefinition"
+        ]
+
+        Resource = "arn:aws:ecs:*:*:task-definition/default-cms-proj-streamlit:*"
       },
       {
         Sid    = "LambdaFunctionManagementPermissions"
