@@ -5,6 +5,7 @@ from airflow.providers.amazon.aws.operators.glue import GlueJobOperator
 from airflow.providers.amazon.aws.operators.lambda_function import LambdaInvokeFunctionOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
 import json
+
 RAW_TO_SILVER_GLUE_JOB = "cms_proj_raw_to_silver_glue_job"
 SILVER_TO_GOLD_GLUE_JOB = "cms_proj_silver_to_gold_glue_job"
 INGESTION_LAMBDA = "move_gdrive_files_to_s3"
@@ -40,7 +41,10 @@ with DAG(
 
         os.environ.pop('AWS_CA_BUNDLE', None)
         os.environ.pop('REQUESTS_CA_BUNDLE', None)
-
+        import certifi
+        cert_path = certifi.where()
+        print("certifi.where():", cert_path)
+        print("File exists:", os.path.exists(cert_path))
         p = context["params"]
         payload = {
             "period": p["period"],
