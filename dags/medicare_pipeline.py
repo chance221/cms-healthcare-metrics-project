@@ -4,7 +4,7 @@ from airflow.models.param import Param
 from airflow.providers.amazon.aws.operators.glue import GlueJobOperator
 from airflow.providers.amazon.aws.operators.lambda_function import LambdaInvokeFunctionOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
-
+import json
 RAW_TO_SILVER_GLUE_JOB = "cms_proj_raw_to_silver_glue_job"
 SILVER_TO_GOLD_GLUE_JOB = "cms_proj_silver_to_gold_glue_job"
 INGESTION_LAMBDA = "move_gdrive_files_to_s3"
@@ -49,7 +49,9 @@ with DAG(
         }
         if p["file_name_contains"]:
             payload["file_name_contains"] = p["file_name_contains"]
-        return payload
+
+        return json.dumps(payload)
+        
 
     check_ingest = should_ingest()
     payload_data = build_ingestion_payload()
