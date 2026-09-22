@@ -18,3 +18,7 @@ COPY configs/ ./configs/
 
 
 RUN pip install --no-cache-dir -e .
+
+EXPOSE 8080
+
+CMD ["streamlit", "run", "streamlit_app/Readmission_vs_Staffing.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.headless=true"]

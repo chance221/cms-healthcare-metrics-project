@@ -55,7 +55,8 @@ resource "aws_iam_policy" "cms_proj_glue_policy" {
         
         Action = [
           "s3:GetObject",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:DeleteObject",
         ],
         
         Resource = [

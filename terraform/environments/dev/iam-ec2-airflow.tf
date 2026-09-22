@@ -47,9 +47,9 @@ resource "aws_iam_policy" "ec2_airflow_run_policy" {
 
         Action = [
           "glue:StartJobRun",
-          "glue:StopJobRun",
           "glue:GetJobRun",
-          "glue:GetJobRuns"
+          "glue:GetJobRuns",
+          "glue:GetJob"
         ]
 
         Resource = [
