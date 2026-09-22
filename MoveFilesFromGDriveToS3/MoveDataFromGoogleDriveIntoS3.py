@@ -16,12 +16,10 @@ import os
 import re
 
 import boto3
-import certifi
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
-import urllib3
 
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
@@ -108,8 +106,7 @@ def lambda_handler(event, context):
 
     print("SSL_CERT_FILE:", os.environ.get("SSL_CERT_FILE"))
     print("REQUESTS_CA_BUNDLE:", os.environ.get("REQUESTS_CA_BUNDLE"))
-    print("urllib3 loaded from:", urllib3.__file__)
-    print("certifi loaded from:", certifi.__file__)
+
     
     s3_bucket = os.environ["S3_BUCKET_NAME"]
     
