@@ -35,7 +35,6 @@ with DAG(
     def should_ingest(**context):
         return context["params"]["run_ingest"]
 
-
     @task
     def build_ingestion_payload(**context):
         p = context["params"]
@@ -47,7 +46,6 @@ with DAG(
         if p["file_name_contains"]:
             payload["file_name_contains"] = p["file_name_contains"]
         return json.dumps(payload)
-
     
     invoke_ingestion_lambda = LambdaInvokeFunctionOperator(
         task_id="invoke_ingestion_lambda",
