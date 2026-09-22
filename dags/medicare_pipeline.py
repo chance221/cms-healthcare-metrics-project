@@ -37,14 +37,7 @@ with DAG(
 
     @task
     def build_ingestion_payload(**context):
-        import os
-
-        os.environ.pop('AWS_CA_BUNDLE', None)
-        os.environ.pop('REQUESTS_CA_BUNDLE', None)
-        import certifi
-        cert_path = certifi.where()
-        print("certifi.where():", cert_path)
-        print("File exists:", os.path.exists(cert_path))
+        
         p = context["params"]
         payload = {
             "period": p["period"],
