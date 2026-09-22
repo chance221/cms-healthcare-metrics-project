@@ -97,12 +97,14 @@ def lambda_handler(event, context):
     Lambda environment variables (set once per deployment via
     Terraform apply):
       S3_BUCKET_NAME, GCP_SERVICE_ACCOUNT_SECRET_NAME
-
     """
     period = event["period"]
     gdrive_folder_id = event["gdrive_folder_id"]
     file_name_contains = event.get("file_name_contains")
     env = event.get("env", "dev")
+
+    print("SSL_CERT_FILE:", os.environ.get("SSL_CERT_FILE"))
+    print("REQUESTS_CA_BUNDLE:", os.environ.get("REQUESTS_CA_BUNDLE"))
 
     s3_bucket = os.environ["S3_BUCKET_NAME"]
     
