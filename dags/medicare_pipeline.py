@@ -4,7 +4,6 @@ from airflow.models.param import Param
 from airflow.providers.amazon.aws.operators.glue import GlueJobOperator
 from airflow.providers.amazon.aws.operators.lambda_function import LambdaInvokeFunctionOperator
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
-import json
 
 RAW_TO_SILVER_GLUE_JOB = "cms_proj_raw_to_silver_glue_job"
 SILVER_TO_GOLD_GLUE_JOB = "cms_proj_silver_to_gold_glue_job"
@@ -37,6 +36,11 @@ with DAG(
 
     @task
     def build_ingestion_payload(**context):
+        import os
+
+        os.environ.pop('AWS_CA_BUNDLE', None)
+        os.environ.pop('REQUESTS_CA_BUNDLE', None)
+
         p = context["params"]
         payload = {
             "period": p["period"],
@@ -45,12 +49,15 @@ with DAG(
         }
         if p["file_name_contains"]:
             payload["file_name_contains"] = p["file_name_contains"]
-        return json.dumps(payload)
+        return payload
+
+    check_ingest = should_ingest()
+    payload_data = build_ingestion_payload()
     
     invoke_ingestion_lambda = LambdaInvokeFunctionOperator(
         task_id="invoke_ingestion_lambda",
         function_name=INGESTION_LAMBDA,
-        payload=build_ingestion_payload(),
+        payload=payload_data,
     )     
 
 
@@ -105,7 +112,8 @@ with DAG(
     )
 
     (
-        should_ingest()
+        check_ingest
+        >> payload_data
         >> invoke_ingestion_lambda
         >> should_raw_to_silver()
         >> wait_for_raw_landing
