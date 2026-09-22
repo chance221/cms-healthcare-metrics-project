@@ -1,5 +1,11 @@
 ###Infra for hosting Streamlit App###
 
+variable "streamlit_image_tag" {
+  description = "ECR image tag for the Streamlit container. A unique tag per build (e.g. prod-<git-sha>) is what makes Terraform detect a real change and trigger a new ECS deployment -- pushing a new image under a static tag like 'latest' does not."
+  type        = string
+  default     = "latest"
+}
+
 
 
 resource "aws_ecr_repository" "cms_proj_streamlit"{
@@ -51,7 +57,7 @@ resource "aws_ecs_express_gateway_service" "streamlit_app" {
   infrastructure_role_arn = aws_iam_role.ecs_express_infra_role.arn
   
   primary_container {
-    image          = "${aws_ecr_repository.cms_proj_streamlit.repository_url}:latest"
+    image          = "${aws_ecr_repository.cms_proj_streamlit.repository_url}:${var.streamlit_image_tag}"
     container_port = 8080 
   }
   

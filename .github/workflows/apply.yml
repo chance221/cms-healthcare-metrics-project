@@ -37,23 +37,6 @@ jobs:
           role-to-assume: arn:aws:iam::440107864885:role/github_apply_role
           aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ">= 1.16"
-
-      - name: Terraform init
-        working-directory: terraform/environments/dev
-        run: terraform init
-
-      - name: Terraform plan
-        working-directory: terraform/environments/dev
-        run: terraform plan
-
-      - name: Terraform apply
-        working-directory: terraform/environments/dev
-        run: terraform apply -auto-approve
-
       - name: Log in to ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
@@ -70,6 +53,23 @@ jobs:
             .
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ">= 1.16"
+
+      - name: Terraform init
+        working-directory: terraform/environments/dev
+        run: terraform init
+
+      - name: Terraform plan
+        working-directory: terraform/environments/dev
+        run: terraform plan -var="streamlit_image_tag=prod-${{ github.sha }}"
+
+      - name: Terraform apply
+        working-directory: terraform/environments/dev
+        run: terraform apply -auto-approve -var="streamlit_image_tag=prod-${{ github.sha }}"
 
       - name: Refresh Airflow code bundle if the instance is running
         working-directory: terraform/environments/dev
