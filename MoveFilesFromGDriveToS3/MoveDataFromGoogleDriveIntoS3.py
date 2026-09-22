@@ -106,7 +106,10 @@ def lambda_handler(event, context):
 
     print("SSL_CERT_FILE:", os.environ.get("SSL_CERT_FILE"))
     print("REQUESTS_CA_BUNDLE:", os.environ.get("REQUESTS_CA_BUNDLE"))
-
+    import certifi
+    cert_path = certifi.where()
+    print("certifi.where():", cert_path)
+    print("File exists:", os.path.exists(cert_path))
     
     s3_bucket = os.environ["S3_BUCKET_NAME"]
     
