@@ -19,9 +19,7 @@ data "archive_file" "google_deps_zip"{
 
   excludes = [
     "python/urllib3",
-    "python/urllib3-2.8.0.dist-info",
-    "python/certifi",
-    "python/certifi-2026.7.22.dist-info"
+    "python/urllib3-2.8.0.dist-info"
   ]
 }
 
