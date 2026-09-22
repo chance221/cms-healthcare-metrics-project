@@ -159,6 +159,21 @@ resource "aws_instance" "airflow_host" {
 
 
 output "airflow_instance_id" {
-  
+
   value = aws_instance.airflow_host.id
+}
+
+
+
+resource "aws_ssm_parameter" "airflow_instance_id" {
+
+  name = "/medicare-pipeline/airflow_instance_id"
+
+  type = "String"
+
+  value = aws_instance.airflow_host.id
+
+  tags = {
+    DEALabs = "MedicareProject"
+  }
 }

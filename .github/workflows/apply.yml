@@ -14,19 +14,6 @@ jobs:
     environment: production
 
     steps:
-      - name: Get and Inspect OIDC Token
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const token = await core.getIDToken('sts.amazonaws.com');
-            // JWT is split into header, payload, signature
-            const payloadBase64 = token.split('.')[1];
-            const payloadJson = Buffer.from(payloadBase64, 'base64').toString('utf8');
-            const claims = JSON.parse(payloadJson);
-            
-            console.log("Full OIDC Claims:", claims);
-            console.log("aud (Audience):", claims.aud);
-            console.log("sub (Subject):", claims.sub);     
 
       - name: Checkout
         uses: actions/checkout@v4
