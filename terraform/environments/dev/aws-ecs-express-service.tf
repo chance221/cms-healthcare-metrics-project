@@ -52,7 +52,7 @@ resource "aws_ecs_express_gateway_service" "streamlit_app" {
 
   execution_role_arn = aws_iam_role.ecs_streamlit_ecr_role.arn
   
-  task_role_arn      = aws_iam_role.ecs_streamlit_s3_role.arn
+  task_role_arn  = aws_iam_role.ecs_streamlit_s3_role.arn
   
   infrastructure_role_arn = aws_iam_role.ecs_express_infra_role.arn
   
