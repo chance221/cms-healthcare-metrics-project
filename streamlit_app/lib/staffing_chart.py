@@ -33,7 +33,7 @@ class MeasureConfig:
 
 
 @st.cache_data
-def load_gold(gold_dataset_name: str, env: str = "dev") -> pd.DataFrame:
+def load_gold(gold_dataset_name: str, env: str = "prod") -> pd.DataFrame:
     env_configs, _ = load_all_environment_configs()
     env_config = next(c for c in env_configs.values() if c.env == env)
     gold_configs, _ = load_all_gold_configs()
@@ -59,7 +59,12 @@ def quartile_summary(d: pd.DataFrame, staffing_col: str, rate_col: str, period_l
 def render_staffing_page(config: MeasureConfig) -> None:
     st.title(f"Nurse Staffing vs. {config.display_name}")
 
-    df = load_gold(config.gold_dataset_name)
+    st.sidebar.header("Environment")
+    selected_env = st.sidebar.selectbox(
+        "Data environment", ["prod", "dev"], key="pipeline_env"
+    )
+
+    df = load_gold(config.gold_dataset_name, env=selected_env)
     key_prefix = config.gold_dataset_name
 
     st.sidebar.header("Filters")
