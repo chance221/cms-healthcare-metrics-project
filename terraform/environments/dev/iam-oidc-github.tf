@@ -160,6 +160,27 @@ resource "aws_iam_policy" "github_dev_env_plan_policy" {
         ],
 
         Resource = "arn:aws:s3:::medicare-pipeline-tf-state-cjk-2026/*"
+      },
+      {
+        Sid = "SSMDescribeParameters"
+
+        Effect = "Allow"
+
+        Action = ["ssm:DescribeParameters"]
+
+        Resource = "*"
+      },
+      {
+        Sid    = "SSMParameterManagementPermissionsPlan"
+
+        Effect = "Allow"
+
+        Action = [
+          "ssm:GetParameter",  "ssm:GetParameters", "ssm:AddTagsToResource", 
+          "ssm:RemoveTagsFromResource", "ssm:ListTagsForResource"          
+        ]
+
+        Resource = "arn:aws:ssm:us-east-1:440107864885:parameter/medicare-pipeline/*"
       }      
     ]
   })
@@ -245,7 +266,7 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
     
     Statement = [
       {
-        Sid    = "EC2InstanceManagementPermissions"
+        Sid = "EC2InstanceManagementPermissions"
         
         Effect = "Allow"
         
@@ -257,6 +278,15 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
           
         ]
         
+        Resource = "*"
+      },
+      {
+        Sid = "SSMDescribeParameters"
+
+        Effect = "Allow"
+
+        Action = ["ssm:DescribeParameters"]
+
         Resource = "*"
       },
       {
@@ -275,15 +305,28 @@ resource "aws_iam_policy" "github_apply_ec2_ssm_policy" {
       },
       {
         Sid    = "SSMSendCommandPermission"
-        
+
         Effect = "Allow"
-        
+
         Action = "ssm:SendCommand"
-        
+
         Resource = [
           "arn:aws:ec2:us-east-1:440107864885:instance/*",
           "arn:aws:ssm:us-east-1::document/AWS-RunShellScript"
         ]
+      },
+      {
+        Sid    = "SSMParameterManagementPermissions"
+
+        Effect = "Allow"
+
+        Action = [
+          "ssm:PutParameter", "ssm:GetParameter", "ssm:DeleteParameter", "ssm:GetParameters",
+          "ssm:AddTagsToResource", "ssm:RemoveTagsFromResource", "ssm:ListTagsForResource",
+          
+        ]
+
+        Resource = "arn:aws:ssm:us-east-1:440107864885:parameter/medicare-pipeline/*"
       }
     ]
   })
@@ -619,7 +662,7 @@ resource "aws_iam_role_policy_attachment" "github_dev_env_plan_policy_attachment
 
 resource "aws_iam_role_policy_attachment" "github_apply_storage_secrets_attachment" {
   
-  role       = aws_iam_role.github_apply_role.name
+  role = aws_iam_role.github_apply_role.name
   
   policy_arn = aws_iam_policy.github_apply_storage_secrets_policy.arn
 }
@@ -628,7 +671,7 @@ resource "aws_iam_role_policy_attachment" "github_apply_storage_secrets_attachme
 
 resource "aws_iam_role_policy_attachment" "github_apply_ec2_ssm_attachment" {
   
-  role       = aws_iam_role.github_apply_role.name
+  role = aws_iam_role.github_apply_role.name
   
   policy_arn = aws_iam_policy.github_apply_ec2_ssm_policy.arn
 }
@@ -637,7 +680,7 @@ resource "aws_iam_role_policy_attachment" "github_apply_ec2_ssm_attachment" {
 
 resource "aws_iam_role_policy_attachment" "github_apply_ecr_ecs_lambda_attachment" {
   
-  role       = aws_iam_role.github_apply_role.name
+  role = aws_iam_role.github_apply_role.name
   
   policy_arn = aws_iam_policy.github_apply_ecr_ecs_lambda_policy.arn
 }
@@ -646,7 +689,7 @@ resource "aws_iam_role_policy_attachment" "github_apply_ecr_ecs_lambda_attachmen
 
 resource "aws_iam_role_policy_attachment" "github_apply_iam_glue_attachment" {
   
-  role       = aws_iam_role.github_apply_role.name
+  role = aws_iam_role.github_apply_role.name
   
   policy_arn = aws_iam_policy.github_apply_iam_glue_policy.arn
 }
