@@ -56,7 +56,7 @@ The Airflow Service is hosted on an EC2 Server is also created using Terraform H
 ## Streamlit Visualizations
 I first aggregated the staffing measures in a way that could allow a single staffing table to be used across multiple quality metrics and joined using the quarter that links to the actual staffing period reflected in the payroll journal for each actual measurement period. Where applicable I have created a filter that only shows metrics where there is a minimum number of cases, or a specific difference in upper and lower confidence intervals to allow a user to dictate the level of accuracy each measure presents. More numbers of cases and smaller differences in upper and lower confidence intervals mean a higher level of accuracy, while lower number of cases and a larger difference in upper and lower confidence intervals would indicate lower accuracy. I created the slider for users to determine for themselves how the metrics are presented at different levels of accuracy.
 
-Each graph is loaded then cached per graph and per environment to prevent constant fetching of data unnecessarily.
+Each graph is loaded then cached per graph and per environment to prevent constant fetching of data unnecessarily.  
 
 
 
