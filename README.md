@@ -58,3 +58,25 @@ I first aggregated the staffing measures in a way that could allow a single staf
 
 Each graph is loaded then cached per graph and per environment to prevent constant fetching of data unnecessarily.
 
+
+
+# How to Run
+
+After a PR approval a reviewer must also approve the deploy. This additional gate is ideal to allow for additional review before Terraform updates each container with the most up to date resource and restarts the applications automatically. When the deploy is approved it kicks off the apply.yaml Github workflow which creates the infrastructure based on HCL statements. The container registry is updated for the Streamlit applications running on ECS Express and the image dependencies are zipped and packaged for the Airflow Service that is hosted in an EC2 server. After the changes are applied there is an output at the end of the Terraform Apply step that gives you the instance IF of the Airflow application as well as the URL for the Streamlit app. You then must SSM into the airflow serviice to get the password using cmd:
+
+aws ssm start-session --target "<target-instance-id>"
+
+You then can obtain the password which will change at each restart:
+
+sudo journalctl -u airflow --no-pager | grep -i password
+
+
+Because we set up the security group to not allow inbound traffic for us to interact with the UI we need to make an instance connection exposing the port we want to connect to locally using this command 
+
+aws ssm start-session --target "<target-instance-id>" --document-name AWS-StartPortForwardingSession --parameters "{\"portNumber\":[\"8080\"],\"localPortNumber\":[\"8080\"]}"
+
+
+We can not see the Airflow UI and select our job. To kick of the actual pipeline we need to provide the correct parameters.
+
+
+
